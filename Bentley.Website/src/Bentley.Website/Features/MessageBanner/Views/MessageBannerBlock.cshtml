@@ -1,0 +1,147 @@
+@using Bentley.Website.Business.Analytics
+@using Bentley.Website.Business.Extensions
+@using Bentley.Website.Features.Cta.Rendering
+@using Bentley.Website.Features.Media
+@using EPiServer.Web.Mvc.TagHelpers.Experience.Internal
+@using EPiServer.Web.Mvc.Html
+@model Bentley.Website.Features.MessageBanner.ViewModels.MessageBannerBlockViewModel
+
+@inject IAnalyticsTextResolver AnalyticsTextResolver
+
+@{
+    var block = Model.CurrentBlock;
+
+    var imageUrl = Url.ContentUrl(block.Image);
+    var hasImage = !string.IsNullOrWhiteSpace(imageUrl);
+
+    var hasPrimaryCta = block.PrimaryCta != null
+        && !string.IsNullOrWhiteSpace(block.PrimaryCta.Href)
+        && !string.IsNullOrWhiteSpace(block.PrimaryCta.Text);
+    var hasSecondaryCta = block.SecondaryCta != null
+        && !string.IsNullOrWhiteSpace(block.SecondaryCta.Href)
+        && !string.IsNullOrWhiteSpace(block.SecondaryCta.Text);
+    var isClickable = hasPrimaryCta ^ hasSecondaryCta;
+
+    string? selectedImageFit = null;
+    string? selectedPrimaryVariant = null;
+    string? selectedPrimaryHideChevron = null;
+    string? selectedSecondaryVariant = null;
+    string? selectedSecondaryHideChevron = null;
+
+    if (ViewData.TryGetCompositionRenderingNode(out var compositionNode))
+    {
+        compositionNode.DisplaySettings.TryGetValue("imageFit", out selectedImageFit);
+        compositionNode.DisplaySettings.TryGetValue("primaryVariant", out selectedPrimaryVariant);
+        compositionNode.DisplaySettings.TryGetValue("primaryHideChevron", out selectedPrimaryHideChevron);
+        compositionNode.DisplaySettings.TryGetValue("secondaryVariant", out selectedSecondaryVariant);
+        compositionNode.DisplaySettings.TryGetValue("secondaryHideChevron", out selectedSecondaryHideChevron);
+    }
+
+    var useFit = string.Equals(selectedImageFit, "fit", StringComparison.OrdinalIgnoreCase);
+    var imageFitClass = useFit ? " message-banner__image--fit" : string.Empty;
+    var cdnFit = useFit ? "contain" : null;
+
+    var primaryPresentation = CtaPresentationResolver.Resolve(selectedPrimaryVariant, selectedPrimaryHideChevron);
+    var secondaryPresentation = CtaPresentationResolver.Resolve(selectedSecondaryVariant ?? "tertiaryText", selectedSecondaryHideChevron);
+    var primaryIconRight = primaryPresentation.ShowChevron ? CtaPresentationResolver.DefaultIcon : null;
+    var primaryIconHover = primaryPresentation.ShowChevron ? CtaPresentationResolver.HoverIcon : null;
+    var secondaryIconRight = secondaryPresentation.ShowChevron ? CtaPresentationResolver.DefaultIcon : null;
+    var secondaryIconHover = secondaryPresentation.ShowChevron ? CtaPresentationResolver.HoverIcon : null;
+}
+
+<div
+    id="@Html.OnPageNavigationAnchorId(block)"
+    data-on-page-nav-title="@Html.OnPageNavigationTitle(block)"
+    data-on-page-nav-hidden="@Html.OnPageNavigationHidden(block)"
+    class="message-banner card-surface@(isClickable ? " message-banner--clickable" : string.Empty)"
+    data-component="message-banner">
+
+    @if (hasImage)
+    {
+        <div class="message-banner__media">
+            <picture url="@imageUrl"
+                     class="message-banner__image@(imageFitClass)"
+                     width="332"
+                     height="140"
+                     description="@block.ImageAltText"
+                     loading="lazy"
+                     fit="@cdnFit"
+                     epi-property="@block.Image"
+                     responsive-items="PictureResponsiveness.MessageBanner"></picture>
+        </div>
+    }
+
+    <div class="message-banner__content">
+        @if (!string.IsNullOrWhiteSpace(block.BadgeText))
+        {
+            <p class="badge message-banner__badge" epi-property="@block.BadgeText">
+                <span class="badge__label">@block.BadgeText</span>
+            </p>
+        }
+
+        <h3 class="message-banner__heading" epi-property="@block.Heading">@block.Heading</h3>
+
+        @if (!string.IsNullOrWhiteSpace(block.Description))
+        {
+            <p class="message-banner__description" epi-property="@block.Description">@block.Description</p>
+        }
+
+        @if (hasPrimaryCta)
+        {
+            <div class="message-banner__actions">
+                @if (!hasSecondaryCta)
+                {
+                    <cta analytics-text="@AnalyticsTextResolver.GetEnglishValue(
+                                             block, 
+                                             english => english.PrimaryCta?.Text,
+                                             english => english.PrimaryCtaAnalyticsText)" 
+                         source="LinkItem"
+                         epi-property="@block.PrimaryCta"
+                         link="@block.PrimaryCta"
+                         variant="@primaryPresentation.Variant"
+                         css-class="message-banner__cta message-banner__cta--primary message-banner__cta--stretched"
+                         icon-right="@primaryIconRight"
+                         icon-hover="@primaryIconHover" />
+                }
+                else
+                {
+                    <cta analytics-text="@AnalyticsTextResolver.GetEnglishValue(
+                                             block, 
+                                             english => english.PrimaryCta?.Text,
+                                             english => english.PrimaryCtaAnalyticsText)" 
+                         source="LinkItem"
+                         epi-property="@block.PrimaryCta"
+                         link="@block.PrimaryCta"
+                         variant="@primaryPresentation.Variant"
+                         css-class="message-banner__cta message-banner__cta--primary"
+                         icon-right="@primaryIconRight"
+                         icon-hover="@primaryIconHover" />
+                    <cta analytics-text="@AnalyticsTextResolver.GetEnglishValue(
+                                             block, 
+                                             english => english.SecondaryCta?.Text, 
+                                             english => english.SecondaryCtaAnalyticsText)" 
+                         source="LinkItem"
+                         epi-property="@block.SecondaryCta"
+                         link="@block.SecondaryCta"
+                         variant="@secondaryPresentation.Variant"
+                         css-class="message-banner__cta message-banner__cta--secondary"
+                         icon-right="@secondaryIconRight"
+                         icon-hover="@secondaryIconHover" />
+                }
+            </div>
+        }
+        else if (hasSecondaryCta)
+        {
+            <div class="message-banner__actions">
+                <cta analytics-text="@AnalyticsTextResolver.GetEnglishValue(block, english => english.SecondaryCta?.Text)" 
+                     source="LinkItem"
+                     epi-property="@block.SecondaryCta"
+                     link="@block.SecondaryCta"
+                     variant="@secondaryPresentation.Variant"
+                     css-class="message-banner__cta message-banner__cta--secondary message-banner__cta--stretched"
+                     icon-right="@secondaryIconRight"
+                     icon-hover="@secondaryIconHover" />
+            </div>
+        }
+    </div>
+</div>
