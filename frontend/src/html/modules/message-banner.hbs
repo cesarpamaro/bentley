@@ -1,0 +1,75 @@
+<div
+  class="message-banner card-surface{{#if primaryCtaHref}}{{#unless secondaryCtaHref}} message-banner--clickable{{/unless}}{{else}}{{#if secondaryCtaHref}} message-banner--clickable{{/if}}{{/if}}"
+  data-component="message-banner"
+  data-on-page-nav-title="{{navigationTitle}}"
+  data-on-page-nav-hidden="{{#if hideFromNavigation}}true{{/if}}"
+>
+  {{#if imageUrl}}
+    <div class="message-banner__media">
+      <img
+        class="message-banner__image{{#if (eq imageFit "fit")}} message-banner__image--fit{{/if}}"
+        src="{{imageUrl}}"
+        alt="{{imageAlt}}"
+        loading="lazy"
+        decoding="async"
+      />
+    </div>
+  {{/if}}
+
+  <div class="message-banner__content">
+    {{#if badgeText}}
+      {{> badge label=badgeText className="message-banner__badge"}}
+    {{/if}}
+
+    <h3 class="message-banner__heading">{{heading}}</h3>
+
+    {{#if description}}
+      <p class="message-banner__description">{{description}}</p>
+    {{/if}}
+
+    {{#if primaryCtaHref}}
+      <div class="message-banner__actions">
+        {{#unless secondaryCtaHref}}
+          {{> button analyticsText=analyticsPrimaryCtaLabel
+            href=primaryCtaHref
+            label=primaryCtaLabel
+            variant=primaryCtaVariant
+            iconRight=primaryCtaIconRight
+            iconHover=primaryCtaIconHover
+            className="message-banner__cta message-banner__cta--primary message-banner__cta--stretched"
+          }}
+        {{else}}
+          {{> button analyticsText=analyticsPrimaryCtaLabel
+            href=primaryCtaHref
+            label=primaryCtaLabel
+            variant=primaryCtaVariant
+            iconRight=primaryCtaIconRight
+            iconHover=primaryCtaIconHover
+            className="message-banner__cta message-banner__cta--primary"
+          }}
+          {{> button analyticsText=analyticsSecondaryCtaLabel
+            href=secondaryCtaHref
+            label=secondaryCtaLabel
+            variant=secondaryCtaVariant
+            iconRight=secondaryCtaIconRight
+            iconHover=secondaryCtaIconHover
+            className="message-banner__cta message-banner__cta--secondary"
+          }}
+        {{/unless}}
+      </div>
+    {{else}}
+      {{#if secondaryCtaHref}}
+        <div class="message-banner__actions">
+          {{> button analyticsText=analyticsSecondaryCtaLabel
+            href=secondaryCtaHref
+            label=secondaryCtaLabel
+            variant=secondaryCtaVariant
+            iconRight=secondaryCtaIconRight
+            iconHover=secondaryCtaIconHover
+            className="message-banner__cta message-banner__cta--secondary message-banner__cta--stretched"
+          }}
+        </div>
+      {{/if}}
+    {{/if}}
+  </div>
+</div>

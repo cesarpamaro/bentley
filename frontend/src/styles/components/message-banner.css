@@ -1,0 +1,141 @@
+@layer components {
+  .message-banner {
+    align-items: flex-start;
+    background-color: var(--color-bg-surface-card-surface);
+    border-radius: var(--radius-xl);
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    justify-content: center;
+    overflow: clip;
+    position: relative;
+
+    /*
+     * .btn (button.hbs / button.css) sets its own `position: relative` for
+     * its focus-ring `::after`. When exactly one CTA is authored, that
+     * CTA's stretched-link overlay (.message-banner__cta--stretched::before)
+     * needs to reach past .btn's own positioning to cover this whole card.
+     * `transform` (any non-none value) makes this element the containing
+     * block for `position: fixed` descendants — fixed positioning ignores
+     * `position: relative` ancestors entirely — so the overlay can declare
+     * `position: fixed` and resolve against this card without touching or
+     * being touched by .btn's own focus-ring positioning.
+     */
+    transform: translate(0);
+  }
+
+  .message-banner--clickable {
+    cursor: pointer;
+  }
+
+  .message-banner.card-surface:not(.message-banner--clickable):is(:hover, :focus-within) {
+    border-color: var(--card-surface-border);
+    box-shadow: var(--card-surface-shadow);
+  }
+
+  .message-banner__media {
+    align-items: center;
+    block-size: 140px;
+    border-radius: var(--radius-md);
+    display: flex;
+    inline-size: 100%;
+    justify-content: center;
+    overflow: hidden;
+    padding-block: 8px 6px;
+    padding-inline: 8px;
+  }
+
+  .message-banner__image,
+  .message-banner__image img {
+    aspect-ratio: 4 / 3;
+    block-size: 100%;
+    border-radius: var(--radius-md);
+    display: block;
+    inline-size: 100%;
+    object-fit: cover;
+    object-position: center;
+    overflow: hidden;
+  }
+
+  /* Additive: for logos and other assets that must not be cropped. */
+  .message-banner__image--fit,
+  .message-banner__image--fit img {
+    object-fit: contain;
+  }
+
+  .message-banner__content {
+    align-items: flex-start;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    inline-size: 100%;
+    justify-content: center;
+    padding-block: 6px 12px;
+    padding-inline: 16px;
+  }
+
+  .message-banner__heading {
+    color: var(--color-text-neutral-primary);
+    font-family: var(--type-h6-font-family);
+    font-size: var(--type-h5-mobile-font-size);
+    font-weight: var(--font-weight-500);
+    letter-spacing: var(--type-h5-mobile-letter-spacing);
+    line-height: var(--type-h5-mobile-line-height);
+    margin: 0;
+    overflow-wrap: break-word;
+  }
+
+  .message-banner__description {
+    color: var(--color-text-neutral-primary);
+    font-size: var(--type-body-mobile-font-size, 16px);
+    line-height: var(--type-body-mobile-line-height, 1.5);
+    margin: 0;
+    overflow-wrap: break-word;
+  }
+
+  .message-banner__actions {
+    align-items: center;
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+    padding-block: 8px;
+  }
+
+  .message-banner__actions .btn {
+    min-block-size: 36px;
+  }
+
+  .message-banner__cta--stretched::before {
+    content: "";
+    inset: 0;
+    position: fixed;
+  }
+
+  @media (width >= 1024px) {
+    .message-banner {
+      align-items: center;
+      flex-direction: row;
+      margin-inline: auto;
+      max-inline-size: 1200px;
+      padding-inline-end: 40px;
+    }
+
+    .message-banner__media {
+      block-size: 100%;
+      inline-size: 240px;
+      padding: 8px;
+    }
+
+    .message-banner__content {
+      flex: 1 0 0;
+      justify-content: flex-start;
+      padding-block: 20px;
+    }
+
+    .message-banner__heading {
+      font-size: var(--type-h6-font-size);
+      letter-spacing: var(--type-h6-letter-spacing);
+      line-height: var(--type-h6-line-height);
+    }
+  }
+}
